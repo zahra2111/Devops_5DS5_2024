@@ -83,7 +83,7 @@ pipeline {
         stage('Build-Image') {
             steps {
                 script {
-                    sh "sudo docker build -t ${APP_IMAGE} ."
+                    sh "docker build -t ${APP_IMAGE} ."
                 }
             }
         }
