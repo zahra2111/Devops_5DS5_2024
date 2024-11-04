@@ -88,7 +88,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>ski_station</finalName>
+		<finalName>ski_station_zahra</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

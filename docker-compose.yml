@@ -3,7 +3,7 @@ services:
     build:
       context: .  
       dockerfile: Dockerfile
-    container_name: ski_station
+    container_name: ski_station_zahra
     restart: always
     depends_on:
       - db
