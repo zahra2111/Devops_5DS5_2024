@@ -7,18 +7,9 @@ pipeline {
 
     environment {
 	VERSION = "1.0.${BUILD_NUMBER}-SNAPSHOT"
-
-        SONAR_TOKEN = credentials('SONAR_TOKEN')
-
-        NEXUS_USERNAME = credentials('NEXUS_USERNAME')
-        NEXUS_PASSWORD = credentials('NEXUS_PASSWORD')
-
-        DOCKERHUB_USERNAME = credentials('DOCKERHUB_USERNAME')
-        DOCKERHUB_PASSWORD = credentials('DOCKERHUB_PASSWORD')
-	DOCKER_REPOSITORY_NAME = 'station_ski_devops'
-	DOCKER_REPOSITORY_NAMESPACE = 'zahrahlioui'
-	DOCKER_REPOSITORY = "${DOCKER_REPOSITORY_NAMESPACE}/${DOCKER_REPOSITORY_NAME}:${VERSION}"
-
+	DOCKER_REPOSITORY_NAME = 'rayene12345'
+	DOCKER_REPOSITORY_NAMESPACE = 'rayene719'
+        DOCKER_REPOSITORY = "${DOCKER_REPOSITORY_NAMESPACE}/${DOCKER_REPOSITORY_NAME}:${VERSION}"
 	APP_IMAGE = "${DOCKER_REPOSITORY_NAME}:${VERSION}"
     }
 
@@ -91,7 +82,7 @@ pipeline {
             steps {
                 script {
 		    sh '''
-                    echo "$DOCKERHUB_PASSWORD" |  docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+                    echo "201Jft2312!" |  docker login --username "rayene719" --password-stdin
 		    docker tag "$APP_IMAGE" "$DOCKER_REPOSITORY"
 		    docker push "$DOCKER_REPOSITORY"
 		    docker image rm "$APP_IMAGE"
