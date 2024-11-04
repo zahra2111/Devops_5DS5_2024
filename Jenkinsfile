@@ -83,7 +83,7 @@ pipeline {
         stage('Build-Image') {
             steps {
                 script {
-                    sh "docker build -t ${APP_IMAGE} ."
+                    sh "sudo docker build -t ${APP_IMAGE} ."
                 }
             }
         }
@@ -91,7 +91,7 @@ pipeline {
             steps {
                 script {
 		    sh '''
-                    echo "$DOCKERHUB_PASSWORD" | sudo docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+                    echo "$DOCKERHUB_PASSWORD" |  docker login --username "$DOCKERHUB_USERNAME" --password-stdin
 		    docker tag "$APP_IMAGE" "$DOCKER_REPOSITORY"
 		    docker push "$DOCKER_REPOSITORY"
 		    docker image rm "$APP_IMAGE"
