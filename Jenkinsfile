@@ -63,13 +63,14 @@ pipeline {
             }
         }
 
-        stage('Build Image') {
-            steps {
-                script {
-                    dockerImage = docker.build("${registry}:${IMAGE_TAG}")
-                }
-            }
-        }
+       stage('Build Docker Image') {
+                   steps {
+                       script {
+                           echo 'Building Docker image...'
+                           sh "docker build -t ${registry}:${IMAGE_TAG} ."
+                       }
+                   }
+               }
 
         stage('Login To Docker') {
             steps {
@@ -81,13 +82,14 @@ pipeline {
             }
         }
 
-        stage('Push to DockerHub') {
-            steps {
-                script {
-                    sh "docker push ${dockerImage.imageName()}"
-                }
-            }
-        }
+       stage('Push to DockerHub') {
+                   steps {
+                       script {
+                           echo 'Pushing Docker image to Docker Hub...'
+                           sh "docker push ${registry}:${IMAGE_TAG}"
+                       }
+                   }
+               }
     }
 
     post {
