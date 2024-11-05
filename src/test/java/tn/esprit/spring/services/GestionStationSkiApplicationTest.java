@@ -16,7 +16,7 @@ class GestionStationSkiApplicationTest {
         // If any configuration or bean initialization fails, this test will throw an exception.
         // No additional implementation is necessary for this type of test.
 
-        
+
     }
 
 }
