@@ -11,6 +11,12 @@ class GestionStationSkiApplicationTest {
 
     @Test
     void contextLoads() {
+
+        // This test verifies that the Spring application context loads without errors.
+        // If any configuration or bean initialization fails, this test will throw an exception.
+        // No additional implementation is necessary for this type of test.
+
+        
     }
 
 }
