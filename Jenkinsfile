@@ -1,122 +1,67 @@
 pipeline {
-    agent any
-
-    tools {
-        maven 'Maven 3.9.9'
-    }
-
-    environment {
-	VERSION = "1.0.${BUILD_NUMBER}-SNAPSHOT"
-
-        SONAR_TOKEN = credentials('SONAR_TOKEN')
-
-        NEXUS_USERNAME = credentials('NEXUS_USERNAME')
-        NEXUS_PASSWORD = credentials('NEXUS_PASSWORD')
-
-        DOCKERHUB_USERNAME = credentials('DOCKERHUB_USERNAME')
-        DOCKERHUB_PASSWORD = credentials('DOCKERHUB_PASSWORD')
-	DOCKER_REPOSITORY_NAME = 'devopsrepos'
-	DOCKER_REPOSITORY_NAMESPACE = 'djelassimariem'
-	DOCKER_REPOSITORY = "${DOCKER_REPOSITORY_NAMESPACE}/${DOCKER_REPOSITORY_NAME}:${VERSION}"
-
-	APP_IMAGE = "${DOCKER_REPOSITORY_NAME}:${VERSION}"
-    }
+    agent any  
+    
+    //environment {
+      //  DOCKER_HUB_CREDENTIALS = credentials('dockerhub-credentials')  // Identifiants DOCKER_HUB 
+     //   NEXUS_CREDENTIALS = credentials('nexus-credentials')  // Identifiants Nexus
+     // SONARQUBE_CREDENTIALS = credentials('sonarqube-credentials') // Identifiants SonarQube
+    //}
 
     stages {
-        stage('Clean') {
+        
+        stage('GIT') {
             steps {
+                // Clonage du projet depuis le dépôt Git
+                echo 'Récupération du code depuis Git...'
+                git branch: 'Mariem_Djelassi_5DS5', url: 'https://github.com/zahra2111/Devops_5DS5_2024.git'
+            }
+        }
+        
+        stage('Maven Build') {
+            steps {
+                // Exécution de Maven pour nettoyer et compiler le projet
+                echo 'Compilation du projet...'
                 script {
-                    sh 'mvn clean'
+                    sh 'mvn clean compile'
                 }
             }
         }
-
-        stage('Versioning') {
+        
+        stage('SonarQube') {
             steps {
+                echo 'Analyse de qualité du code avec SonarQube...'
                 script {
-		    sh "mvn versions:set -DnewVersion=${VERSION}"
+                    withSonarQubeEnv('SonarQube') {  
+                        sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=SonarQube.5DS5'
+                    }
                 }
             }
         }
-
-        stage('Compile') {
+        
+        stage('JUNIT/MOCKITO') {
             steps {
+                echo 'Exécution des tests unitaires avec JUnit...'
                 script {
-                    sh 'mvn compile -DskipTests'
+                    sh 'mvn test'
+                    sh 'mvn clean package'
                 }
             }
         }
-
-
-        stage('Junit & Mockito') {
+        
+        stage('Nexus') {
             steps {
-                script {
-                    sh 'mvn verify test -DskipCompile'
-                }
-            }
-        }
-
-        stage('Sonar-Test') {
-            steps {
-		script {
-                    sh 'mvn sonar:sonar -Dsonar.host.url=http://sonar:9000'
-                }
-            }
-        }
-
-        stage('Package') {
-            steps {
-                script {
-                    sh 'mvn package -DskipTests -DskipCompile'
-                }
-            }
-        }
-
-        stage('Deploy-Nexus') {
-            steps {
-                script {
-		    sh "mvn deploy -DskipTests -DskipCompile -DskipPackaging -s mvn-settings.xml -P snapshot"
-                }
-            }
-        }
-
-        stage('Build-Image') {
-            steps {
-                script {
-                    sh "docker build -t ${APP_IMAGE} ."
-                }
-            }
-        }
-        stage('Push-Image-Dockerhub') {
-            steps {
-                script {
-		    sh '''
-                    echo "$DOCKERHUB_PASSWORD" |  docker login --username "$DOCKERHUB_USERNAME" --password-stdin
-		    docker tag "$APP_IMAGE" "$DOCKER_REPOSITORY"
-		    docker push "$DOCKER_REPOSITORY"
-		    docker image rm "$APP_IMAGE"
-                    '''
-                }
-            }
-        }
-        stage('Deploy-Container') {
-            steps {
-                script {
-                    sh 'docker-compose down && docker-compose up -d'
-                }
+                echo 'build: '
+                sh 'mvn clean deploy -Dusername=admin -Dpassword=nexus -DskipTests'
             }
         }
     }
-
+    
     post {
-        always {
-            echo 'Pipeline completed!'
-        }
         success {
-            echo 'Build was successful!'
+            echo 'Pipeline exécuté avec succès!'
         }
         failure {
-            echo 'Build failed.'
+            echo 'Le pipeline a échoué, analysez les logs pour plus de détails.'
         }
     }
 }
